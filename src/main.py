@@ -15,7 +15,7 @@
 
 from core import instances, game, auth
 
-auth.logout
+auth.logout()
 valid_session = auth.get_valid_session()
 
 if valid_session == None :
