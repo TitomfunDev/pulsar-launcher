@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 tests/
 config.json
+dist/
+build/
+*.spec
+private/
