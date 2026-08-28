@@ -15,7 +15,7 @@ def fetch_instance_manifest(url: str) -> dict | None:
         return None
 
 def download_and_extract_zip(download_url: str, expected_hash: str, instance_id: str):
-    instance_dir = Path(paths.get_current_instance_dir(instance_id))
+    instance_dir = Path(paths.get_selected_instance_dir(instance_id))
     instance_dir.mkdir(parents=True, exist_ok=True)
     
     zip_path = instance_dir / "temp_download.zip"
@@ -43,7 +43,7 @@ def download_and_extract_zip(download_url: str, expected_hash: str, instance_id:
         os.remove(zip_path)    
 
 def install_minecraft(version: str, instance_id: str, loader_type: str | None = None, loader_version: str | None = None) -> None:
-    instance_dir = paths.get_current_instance_dir(instance_id)
+    instance_dir = paths.get_selected_instance_dir(instance_id)
 
     if not loader_type or loader_type.lower() == "vanilla":
         mll.install.install_minecraft_version(version, instance_dir)

@@ -3,7 +3,6 @@ from minecraft_launcher_lib.exceptions import InvalidRefreshToken
 import keyring
 import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
 
 # All variables needed
 # Microsoft / WebServer
@@ -12,7 +11,7 @@ REDIRECT_URL = "http://localhost:9000"
 PORT = 9000
 intercepted_path = None
 # Keyring
-SERVICE_NAME = "titomfun_launcher"
+SERVICE_NAME = "pulsar_launcher"
 ACCOUNT_KEY = "minecraft_refresh_token"
 
 

@@ -14,7 +14,7 @@ def _make_options() -> dict:
 
 def _make_command(instance_id: str) -> list[str]:
     version_id = instances.get_version(instance_id)
-    game_dir = paths.get_current_instance_dir(instance_id)
+    game_dir = paths.get_selected_instance_dir(instance_id)
     options = _make_options()
 
     return mll.command.get_minecraft_command(
@@ -28,4 +28,4 @@ def launch(instance_id: str):
     instances.install_instance(instance_id)
 
     command = _make_command(instance_id)
-    subprocess.run(command, cwd=paths.get_current_instance_dir(instance_id))
+    subprocess.run(command, cwd=paths.get_selected_instance_dir(instance_id))

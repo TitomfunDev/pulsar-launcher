@@ -37,7 +37,7 @@ def sync_and_get_manifest() -> dict:
     local_version = local_manifest.get("manifest_version", 0)
     remote_version = remote_manifest.get("manifest_version", 0)
 
-    if remote_version > local_version:
+    if remote_version == 0 or remote_version > local_version:
         _save_local_manifest(remote_manifest)
         return remote_manifest
 
@@ -49,7 +49,7 @@ def get_all_instances() -> list[str]:
     return [instance["id"] for instance in instances if "id" in instance]
 
 def get_instance_infos(instance_id: str) -> dict:
-    local_manifest = _load_local_manifest()
+    local_manifest = _load_local_manifest() or {}
     instances = local_manifest.get("instances", [])
 
     for instance in instances:
