@@ -1,10 +1,14 @@
+# Dependecies imports
 import json
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 from . import paths
 from . import download
 
+# Variables
 MANIFEST_URL = "https://cdn.titomfun.fr/launcher/manifest.json"
 LOCAL_MANIFEST_PATH = Path(paths.get_launcher_dir()) / "manifest.json"
+
 
 def _load_local_manifest() -> dict | None:
     if LOCAL_MANIFEST_PATH.exists():
@@ -14,12 +18,14 @@ def _load_local_manifest() -> dict | None:
             return None
     return None
 
+
 def _save_local_manifest(manifest: dict) -> None:
     LOCAL_MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)
     LOCAL_MANIFEST_PATH.write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False), 
         encoding="utf-8"
     )
+
 
 def sync_and_get_manifest() -> dict:
     local_manifest = _load_local_manifest()
@@ -46,10 +52,12 @@ def sync_and_get_manifest() -> dict:
 
     return local_manifest
 
-def get_all_instances() -> list[str]:
+
+def get_all_event_instances() -> list[str]:
     local_manifest = _load_local_manifest() or {}
     instances = local_manifest.get("instances", [])
     return [instance["id"] for instance in instances if "id" in instance]
+
 
 def get_instance_infos(instance_id: str) -> dict:
     local_manifest = _load_local_manifest() or {}
@@ -60,6 +68,11 @@ def get_instance_infos(instance_id: str) -> dict:
             return instance
             
     return {}
+
+def get_installed_instance():
+    
+    return None
+
 
 def get_version(instance_id: str) -> str:
     """Retourne l'ID exact de la version tel que généré par minecraft_launcher_lib."""
@@ -77,7 +90,7 @@ def get_version(instance_id: str) -> str:
     loader_type = loader.get("type", "").lower()
     loader_version = loader.get("version", "")
 
-    # Conventions de nommage de minecraft_launcher_lib
+    # Naming convention for minecraft_launcher_lib
     if loader_type == "fabric":
         return f"fabric-loader-{loader_version}-{mc_version}"
     elif loader_type == "quilt":
@@ -89,6 +102,7 @@ def get_version(instance_id: str) -> str:
 
     return mc_version
 
+
 def install_instance(instance_id: str) -> bool:
     instance = get_instance_infos(instance_id)
     if not instance:
@@ -98,15 +112,23 @@ def install_instance(instance_id: str) -> bool:
     loader_config = mc_config.get("loader")
     loader_type = loader_config.get("type") if loader_config else None
     loader_version = loader_config.get("version") if loader_config else None
-    mods = instance.get("mods")
-    config = instance.get("config")
 
-    download.install_minecraft(mc_config["version"], instance_id, loader_type, loader_version)
+    downloads = instance.get("downloads")
+    max_tasks = 1 + len(downloads)
 
-    if mods is not None:
-        download.download_and_extract_zip(mods["url"], mods["sha256"], instance_id)
+    with ThreadPoolExecutor(max_workers=max_tasks) as executor:
+        futures = []
 
-    if config is not None:
-        download.download_and_extract_zip(config["url"], config["sha256"], instance_id)
+        futures.append(
+            executor.submit(
+                download.install_minecraft,mc_config["version"],instance_id,loader_type,loader_version
+            )
+        )
+
+        for category, data in downloads.items():
+            if isinstance(data, dict) and "url" in data and "sha256" in data:
+                futures.append(executor.submit(download.download_ressources, data["url"], data["sha256"], instance_id))
+        for future in futures:
+            future.result()
 
     return True

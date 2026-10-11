@@ -1,7 +1,9 @@
+# Dependencies imports
 import hashlib
 import minecraft_launcher_lib as mll
 import os
 import requests
+import uuid
 import zipfile
 from . import paths
 from pathlib import Path
@@ -14,11 +16,12 @@ def fetch_instance_manifest(url: str) -> dict | None:
     except (requests.RequestException, ValueError):
         return None
 
-def download_and_extract_zip(download_url: str, expected_hash: str, instance_id: str):
+def download_ressources(download_url: str, expected_hash: str, instance_id: str):
     instance_dir = Path(paths.get_selected_instance_dir(instance_id))
     instance_dir.mkdir(parents=True, exist_ok=True)
-    
-    zip_path = instance_dir / "temp_download.zip"
+
+    unique_id = uuid.uuid4().hex
+    zip_path = instance_dir / f"temp_download_{unique_id}.zip"
 
     response = requests.get(download_url, stream=True, timeout=30)
     response.raise_for_status()
@@ -40,7 +43,8 @@ def download_and_extract_zip(download_url: str, expected_hash: str, instance_id:
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
             zip_ref.extractall(instance_dir)
     finally:
-        os.remove(zip_path)    
+        if zip_path.exists():
+            os.remove(zip_path)
 
 def install_minecraft(version: str, instance_id: str, loader_type: str | None = None, loader_version: str | None = None) -> None:
     instance_dir = paths.get_selected_instance_dir(instance_id)
