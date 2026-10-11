@@ -17,3 +17,6 @@ def get_instance_dir() -> str:
 
 def get_selected_instance_dir(selected_instance: str) -> str:
     return str(DATA_DIR / "instances" / selected_instance)
+
+def get_cache_dir() -> str:
+    return str(DATA_DIR / "cache")
