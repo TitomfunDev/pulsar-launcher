@@ -74,6 +74,9 @@ class OAuthRedirectHandler(BaseHTTPRequestHandler):
         """
         self.wfile.write(html_response.encode("utf-8"))
 
+    def log_message(self, format, *args):
+        return
+
 
 def login():
     global intercepted_path
