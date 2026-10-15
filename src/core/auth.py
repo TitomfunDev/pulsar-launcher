@@ -4,6 +4,7 @@ import keyring
 import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
+
 # All variables needed
 # Microsoft / WebServer
 CLIENT_ID = "1eff74ba-7d03-4976-aaeb-8866913c1776"
@@ -19,14 +20,17 @@ ACCOUNT_KEY = "minecraft_refresh_token"
 def _save_refresh_token(refresh_token: str):
     keyring.set_password(SERVICE_NAME, ACCOUNT_KEY, refresh_token)
 
+
 def _get_refresh_token() -> str | None:
     return keyring.get_password(SERVICE_NAME, ACCOUNT_KEY)
+
 
 def logout():
     try:
         keyring.delete_password(SERVICE_NAME, ACCOUNT_KEY)
     except Exception:
         pass
+
 
 # Login functions
 class OAuthRedirectHandler(BaseHTTPRequestHandler):
@@ -55,11 +59,12 @@ class OAuthRedirectHandler(BaseHTTPRequestHandler):
                 
                 const countdown = setInterval(() => {
                     timeLeft--;
-                    timerElement.textContent = timeLeft;
+                    if (timerElement) {
+                        timerElement.textContent = timeLeft;
+                    }
                     
                     if (timeLeft <= 0) {
                         clearInterval(countdown);
-                        // Tentative de fermeture de la fenêtre/onglet
                         window.close();
                     }
                 }, 1000);
@@ -69,8 +74,6 @@ class OAuthRedirectHandler(BaseHTTPRequestHandler):
         """
         self.wfile.write(html_response.encode("utf-8"))
 
-    def log_message(self, format, *args):
-        return
 
 def login():
     global intercepted_path
@@ -81,7 +84,7 @@ def login():
     try:
         server = HTTPServer(('localhost', PORT), OAuthRedirectHandler)
     except OSError:
-        print(f"Erreur : Le port {PORT} est déjà utilisé par une autre application.")
+        print(f"Error: Port {PORT} is already in use by another application.")
         return None
     
     server.timeout = 120
@@ -105,8 +108,9 @@ def login():
         _save_refresh_token(login_data["refresh_token"])
 
     except Exception as e:
-        print(f"\n❌ Erreur lors du traitement du code : {e}")
+        print(f"\n Error processing the code {e}")
         return None
+
 
 def get_valid_session() -> dict | None:
     refresh_token = _get_refresh_token() 
@@ -123,9 +127,9 @@ def get_valid_session() -> dict | None:
         return session_data
         
     except InvalidRefreshToken:
-        print("La session a expiré. Une nouvelle connexion est requise.")
+        print("The session has expired. A new connection is required.")
         logout()
         return None
     except Exception as e:
-        print(f"Erreur de connexion aux serveurs Microsoft : {e}")
+        print(f"Error connecting to Microsoft servers: {e}")
         return None
