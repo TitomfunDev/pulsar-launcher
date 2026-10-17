@@ -21,7 +21,6 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.14.8'
-        cache: 'pip'
 
     - name: Generate version file
       run: |
@@ -48,7 +47,7 @@ jobs:
           pip install --upgrade pip &&
           pip install -r requirements.txt &&
           pip install pyinstaller &&
-          pyinstaller --onefile --windowed --paths src --name PulsarLauncher src/main.py
+          pyinstaller --onefile --windowed --paths src --name PulsarLauncher src/main.py &&
           mv dist/PulsarLauncher dist/PulsarLauncher-${{ github.ref_name }}
         "
 
