@@ -49,7 +49,7 @@ def sync_and_get_manifest() -> dict:
     remote_version = remote_manifest.get("manifest_version", 0)
 
     if remote_manifest.get("deprecated", True):
-        raise DeprecatedFeatureError("Manifest deprecated.")
+        raise DeprecatedFeatureError("Manifest feature deprecated.")
 
     if remote_version == 0 or remote_version > local_version:
         _save_local_manifest(remote_manifest)
