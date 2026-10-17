@@ -91,7 +91,7 @@ del "%~f0"
 
         subprocess.Popen(
             ["cmd.exe", "/c", bat_path],
-            creationflags=subprocess.CREATE_NEW_CONSOLE | subprocess.DETACHED_PROCESS
+            creationflags=subprocess.CREATE_NEW_CONSOLE
         )
         sys.exit(0)
 
