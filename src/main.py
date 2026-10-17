@@ -13,15 +13,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from core import instances, game, auth
+import sys
+from PySide6.QtWidgets import QApplication, QMessageBox
 
-auth.logout()
-valid_session = auth.get_valid_session()
+from ui.app import MainLauncherWindow
+from core import auth, instances, updater
+from core.instances import DeprecatedFeatureError
 
-if valid_session == None :
+app = QApplication(sys.argv)
+
+updater.check_and_update()
+
+if auth.get_valid_session() is None :
     auth.login()
 
-instances.sync_and_get_manifest()
-game.launch("build-a-village-halloween-2026")
+try:
+    instances.sync_and_get_manifest()
+except DeprecatedFeatureError as e:
+    QMessageBox.warning(
+        None,
+        "Deprecated Feature",
+        f"Warning!\n{e}\nPlease update your launcher as this feature will stop working soon."
+    )  
 
-auth.logout()
+
+window = MainLauncherWindow()
+window.show()
+sys.exit(app.exec())
