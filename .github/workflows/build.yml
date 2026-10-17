@@ -49,17 +49,13 @@ jobs:
           pip install -r requirements.txt &&
           pip install pyinstaller &&
           pyinstaller --onefile --windowed --paths src --name PulsarLauncher src/main.py
+          mv dist/PulsarLauncher dist/PulsarLauncher-${{ github.ref_name }}
         "
 
     - name: Rename artifact (Windows)
       if: matrix.os == 'windows-latest'
       run: |
         Move-Item dist/PulsarLauncher.exe dist/PulsarLauncher-${{ github.ref_name }}.exe
-
-    - name: Rename artifact (Linux)
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        mv dist/PulsarLauncher dist/PulsarLauncher-${{ github.ref_name }}
 
     - name: Package artifact (macOS)
       if: matrix.os == 'macos-latest'
