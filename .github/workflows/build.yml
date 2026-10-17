@@ -48,19 +48,19 @@ jobs:
           pip install -r requirements.txt &&
           pip install pyinstaller &&
           pyinstaller --onefile --windowed --paths src --name PulsarLauncher src/main.py &&
-          mv dist/PulsarLauncher dist/PulsarLauncher-${{ github.ref_name }}
+          mv dist/PulsarLauncher dist/PulsarLauncher-${{ github.ref_name }}-linux
         "
 
     - name: Rename artifact (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        Move-Item dist/PulsarLauncher.exe dist/PulsarLauncher-${{ github.ref_name }}.exe
+        Move-Item dist/PulsarLauncher.exe dist/PulsarLauncher-${{ github.ref_name }}-windows.exe
 
     - name: Package artifact (macOS)
       if: matrix.os == 'macos-latest'
       run: |
         cd dist
-        zip -r PulsarLauncher-${{ github.ref_name }}.app.zip PulsarLauncher.app
+        zip -r PulsarLauncher-${{ github.ref_name }}-macos.app.zip PulsarLauncher.app
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
