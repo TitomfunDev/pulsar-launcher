@@ -44,7 +44,7 @@ jobs:
       run: |
         docker run --rm -v ${{ github.workspace }}:/src python:3.14.8-slim bash -c "
           cd /src &&
-          apt-get update && apt-get install -y git &&
+          apt-get update && apt-get install -y git binutils &&
           pip install --upgrade pip &&
           pip install -r requirements.txt &&
           pip install pyinstaller &&
