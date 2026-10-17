@@ -1,0 +1,94 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.14.8'
+        cache: 'pip'
+
+    - name: Generate version file
+      run: |
+        echo "INTERNAL_TAG = \"${{ github.ref_name }}\"" > src/version.py
+
+    - name: Install dependencies (Windows/macOS)
+      if: matrix.os != 'ubuntu-latest'
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    - name: Build with PyInstaller (Windows/macOS)
+      if: matrix.os != 'ubuntu-latest'
+      run: |
+        pyinstaller --onefile --windowed --paths src --name PulsarLauncher src/main.py
+
+    - name: Build with PyInstaller (Linux - Docker)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/src python:3.14.8-slim bash -c "
+          cd /src &&
+          apt-get update && apt-get install -y git &&
+          pip install --upgrade pip &&
+          pip install -r requirements.txt &&
+          pip install pyinstaller &&
+          pyinstaller --onefile --windowed --paths src --name PulsarLauncher src/main.py
+        "
+
+    - name: Rename artifact (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        Move-Item dist/PulsarLauncher.exe dist/PulsarLauncher-${{ github.ref_name }}.exe
+
+    - name: Rename artifact (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        mv dist/PulsarLauncher dist/PulsarLauncher-${{ github.ref_name }}
+
+    - name: Package artifact (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        cd dist
+        zip -r PulsarLauncher-${{ github.ref_name }}.app.zip PulsarLauncher.app
+
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: executable-${{ matrix.os }}
+        path: |
+          dist/PulsarLauncher-${{ github.ref_name }}*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        merge-multiple: true
+
+    - name: Publish Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          artifacts/PulsarLauncher-${{ github.ref_name }}*
+        draft: true
