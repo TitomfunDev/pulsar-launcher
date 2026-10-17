@@ -18,7 +18,6 @@ If something is incorrect, please open an issue [here](https://github.com/Titomf
 
 ### Added
 - Added temporary UI for first use of the launcher in real situation.
-- Added first version for updater manager for auto and easy app updating.
 - Added instance version management for quicker game launch rather than redownloading everthing.
 - Added deprecation management feature.
 
