@@ -6,9 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 If something is incorrect, please open an issue [here](https://github.com/TitomfunDev/pulsar-launcher/issues/new)
 
-## [Unreleased]
+## [Unreleased] - 2026-10-XX
+
+## [0.1.0-alpha] - 2026-10-17
+
+### Changed
+- Renamed project from `titomfun_launcher` to `pulsar_launcher`.
+- Download.py revamp for threading.
+- Main.py entry point revamped. 
+
 
 ### Added
+- Added temporary UI for first use of the launcher in real situation.
+- Added first version for updater manager for auto and easy app updating.
+- Added instance version management for quicker game launch rather than redownloading everthing.
+- Added deprecation management feature.
 
 
 ## [0.0.1-alpha] - 2026-08-23
