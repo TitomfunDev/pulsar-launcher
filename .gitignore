@@ -7,3 +7,4 @@ dist/
 build/
 *.spec
 private/
+version.py
