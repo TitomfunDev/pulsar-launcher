@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from . import paths
 from . import download
 
+
 # Variables
 MANIFEST_URL = "https://cdn.titomfun.fr/launcher/manifest.json"
 LOCAL_MANIFEST_PATH = Path(paths.get_launcher_dir()) / "manifest.json"
@@ -27,6 +28,10 @@ def _save_local_manifest(manifest: dict) -> None:
     )
 
 
+class DeprecatedFeatureError(Exception):
+    pass
+
+
 def sync_and_get_manifest() -> dict:
     local_manifest = _load_local_manifest()
     remote_manifest = download.fetch_instance_manifest(MANIFEST_URL)
@@ -44,7 +49,7 @@ def sync_and_get_manifest() -> dict:
     remote_version = remote_manifest.get("manifest_version", 0)
 
     if remote_manifest.get("deprecated", True):
-        raise DeprecationWarning("Manifest deprecated.")
+        raise DeprecatedFeatureError("Manifest deprecated.")
 
     if remote_version == 0 or remote_version > local_version:
         _save_local_manifest(remote_manifest)
@@ -68,6 +73,7 @@ def get_instance_infos(instance_id: str) -> dict:
             return instance
             
     return {}
+
 
 def get_installed_instance():
     
