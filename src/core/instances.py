@@ -44,7 +44,7 @@ def sync_and_get_manifest() -> dict:
     remote_version = remote_manifest.get("manifest_version", 0)
 
     if remote_manifest.get("deprecated", True):
-        raise DeprecationWarning
+        raise DeprecationWarning("Manifest deprecated.")
 
     if remote_version == 0 or remote_version > local_version:
         _save_local_manifest(remote_manifest)
@@ -108,6 +108,18 @@ def install_instance(instance_id: str) -> bool:
     if not instance:
         return False
 
+    instance_folder = Path(paths.get_selected_instance_dir(instance_id))
+    version_file_path = instance_folder / "version.txt"
+    version = None
+    try:
+        with open(version_file_path, "r", encoding="utf-8") as fichier:
+            version = int(fichier.read().strip())
+            if version >= instance["instance_version"] :
+                return True
+    except (FileNotFoundError, ValueError):
+        pass
+
+
     mc_config = instance["minecraft"]
     loader_config = mc_config.get("loader")
     loader_type = loader_config.get("type") if loader_config else None
@@ -127,8 +139,11 @@ def install_instance(instance_id: str) -> bool:
 
         for category, data in downloads.items():
             if isinstance(data, dict) and "url" in data and "sha256" in data:
-                futures.append(executor.submit(download.download_ressources, data["url"], data["sha256"], instance_id))
+                futures.append(executor.submit(download.download_ressources, data["url"], data["sha256"], instance_id, category))
         for future in futures:
             future.result()
+
+    instance_folder.mkdir(parents=True, exist_ok=True)
+    version_file_path.write_text(str(instance["instance_version"]), encoding="utf-8")
 
     return True

@@ -3,7 +3,7 @@ import hashlib
 import minecraft_launcher_lib as mll
 import os
 import requests
-import uuid
+import shutil
 import zipfile
 from . import paths
 from pathlib import Path
@@ -16,12 +16,16 @@ def fetch_instance_manifest(url: str) -> dict | None:
     except (requests.RequestException, ValueError):
         return None
 
-def download_ressources(download_url: str, expected_hash: str, instance_id: str):
+def download_ressources(download_url: str, expected_hash: str, instance_id: str, category: str):
     instance_dir = Path(paths.get_selected_instance_dir(instance_id))
-    instance_dir.mkdir(parents=True, exist_ok=True)
+    target_dir = instance_dir / category
+    
+    if target_dir.exists():
+        shutil.rmtree(target_dir)
+    
+    target_dir.mkdir(parents=True, exist_ok=True)
 
-    unique_id = uuid.uuid4().hex
-    zip_path = instance_dir / f"temp_download_{unique_id}.zip"
+    zip_path = instance_dir / f"temp_{category}.zip"
 
     response = requests.get(download_url, stream=True, timeout=30)
     response.raise_for_status()
@@ -41,7 +45,7 @@ def download_ressources(download_url: str, expected_hash: str, instance_id: str)
 
     try:
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            zip_ref.extractall(instance_dir)
+            zip_ref.extractall(target_dir)
     finally:
         if zip_path.exists():
             os.remove(zip_path)
