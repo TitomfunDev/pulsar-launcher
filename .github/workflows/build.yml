@@ -36,7 +36,7 @@ jobs:
     - name: Build with PyInstaller (Windows/macOS)
       if: matrix.os != 'ubuntu-latest'
       run: |
-        pyinstaller --onefile --windowed --paths src --name PulsarLauncher src/main.py
+        pyinstaller --onedir --windowed --paths src --name PulsarLauncher src/main.py
 
     - name: Build with PyInstaller (Linux - Docker)
       if: matrix.os == 'ubuntu-latest'
@@ -51,10 +51,10 @@ jobs:
           mv dist/PulsarLauncher dist/PulsarLauncher-${{ github.ref_name }}-linux
         "
 
-    - name: Rename artifact (Windows)
+    - name: Package artifact (Windows)
       if: matrix.os == 'windows-latest'
       run: |
-        Move-Item dist/PulsarLauncher.exe dist/PulsarLauncher-${{ github.ref_name }}-windows.exe
+        Compress-Archive -Path dist/PulsarLauncher -DestinationPath dist/PulsarLauncher-${{ github.ref_name }}-windows.zip
 
     - name: Package artifact (macOS)
       if: matrix.os == 'macos-latest'
