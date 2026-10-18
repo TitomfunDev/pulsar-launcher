@@ -23,8 +23,14 @@ jobs:
         python-version: '3.14.8'
 
     - name: Generate version file
+      shell: python
       run: |
-        echo "INTERNAL_TAG = \"${{ github.ref_name }}\"" > src/core/version.py
+        import os
+        os.makedirs("src/core", exist_ok=True)
+        tag = os.environ.get("GITHUB_REF_NAME", "v0.0.0-dev")
+        with open("src/core/version.py", "w", encoding="utf-8") as f:
+            f.write(f'INTERNAL_TAG = "{tag}"\n')
+        print(f"Generated src/core/version.py with tag: {tag}")
 
     - name: Build with PyInstaller (Windows/macOS)
       if: matrix.os != 'ubuntu-latest'
