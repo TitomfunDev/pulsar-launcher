@@ -8,6 +8,11 @@ If something is incorrect, please open an issue [here](https://github.com/Titomf
 
 ## [Unreleased] - XXXX-XX-XX
 
+## [0.2.1-alpha] - 2026-10-18
+
+### Fixed
+- HotFix, changed pyinstaller configuration in build.yml
+
 ## [0.2.0-alpha] - 2026-10-18
 
 ### Changed
