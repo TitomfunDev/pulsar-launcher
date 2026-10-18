@@ -5,6 +5,10 @@ from core import game, auth
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtWidgets import QLabel, QMainWindow, QPushButton, QVBoxLayout, QWidget
 
+try:
+    from version import INTERNAL_TAG
+except ImportError:
+    INTERNAL_TAG = "v0.0.0-dev"
 
 class GameLauncherWorker(QThread):
     finished = Signal(bool, str)
@@ -105,6 +109,10 @@ class MainLauncherWindow(QMainWindow):
         layout.addWidget(self.logout_btn, alignment=Qt.AlignCenter)
 
         self.launcher_thread = None
+
+        self.version_label = QLabel("Current version : " + INTERNAL_TAG)
+        self.version_label.setStyleSheet("font-size: 14px; color: #a6adc8;")
+        layout.addWidget(self.version_label, alignment=Qt.AlignCenter)
 
     def on_play_clicked(self):
         self.play_btn.setEnabled(False)
