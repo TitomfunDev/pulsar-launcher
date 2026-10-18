@@ -6,7 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 If something is incorrect, please open an issue [here](https://github.com/TitomfunDev/pulsar-launcher/issues/new)
 
-## [Unreleased] - 2026-10-XX
+## [Unreleased] - XXXX-XX-XX
+
+## [0.2.0-alpha] - 2026-10-18
+
+### Changed
+- Main.py entry point revamped.
+
+### Added
+- Added Auto-updater for Windows, Linux et MacOS.
+- Added version control on the UI to version correct update.
 
 ## [0.1.0-alpha] - 2026-10-17
 
