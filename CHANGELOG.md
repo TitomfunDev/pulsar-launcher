@@ -8,19 +8,29 @@ If something is incorrect, please open an issue [here](https://github.com/Titomf
 
 ## [Unreleased] - XXXX-XX-XX
 
+## [0.3.0-alpha] - 2026-10-18
+
+### Added
+- Added update confirmation prompt for new versions.
+- Integrated PySide6 dialogs for clearer status messages and notifications.
+
+
 ## [0.2.1-alpha] - 2026-10-18
 
 ### Fixed
 - HotFix, changed pyinstaller configuration in build.yml
+
 
 ## [0.2.0-alpha] - 2026-10-18
 
 ### Changed
 - Main.py entry point revamped.
 
+
 ### Added
 - Added Auto-updater for Windows, Linux et MacOS.
 - Added version control on the UI to version correct update.
+
 
 ## [0.1.0-alpha] - 2026-10-17
 
