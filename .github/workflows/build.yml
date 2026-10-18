@@ -24,7 +24,7 @@ jobs:
 
     - name: Generate version file
       run: |
-        echo "INTERNAL_TAG = \"${{ github.ref_name }}\"" > version.py
+        echo "INTERNAL_TAG = \"${{ github.ref_name }}\"" > src/version.py
 
     - name: Build with PyInstaller (Windows/macOS)
       if: matrix.os != 'ubuntu-latest'

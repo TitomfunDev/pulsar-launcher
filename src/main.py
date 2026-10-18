@@ -20,7 +20,18 @@ from ui.app import MainLauncherWindow
 from core import auth, instances, updater
 from core.instances import DeprecatedFeatureError
 
+try:
+    from version import INTERNAL_TAG
+except ImportError:
+    INTERNAL_TAG = "v0.0.0-dev"
+
 app = QApplication(sys.argv)
+
+QMessageBox.warning(
+        None,
+        "Version",
+        f"{INTERNAL_TAG}"
+    )  
 
 updater.check_and_update()
 
