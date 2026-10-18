@@ -9,6 +9,8 @@ import uuid
 import zipfile
 from packaging.version import parse
 
+from ui import dialogs
+
 try:
     from core.version import INTERNAL_TAG
 except ImportError:
@@ -21,7 +23,7 @@ GITHUB_API_URL = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/release
 def check_and_update():
     is_compiled = getattr(sys, 'frozen', False)
     if not is_compiled:
-        print("Dev mode enable. Update skipped.")
+        print("Dev mode enabled. Update skipped.")
         return
     
     try:
@@ -34,17 +36,19 @@ def check_and_update():
 
     latest_tag = data.get("tag_name")
     if not latest_tag or parse(latest_tag) <= parse(INTERNAL_TAG):
-        print("PulsarLauncher is up to date.")
         return
-
-    print(f"Update available: {latest_tag} (current: {INTERNAL_TAG})")
 
     asset = find_matching_asset(data.get("assets", []))
     if not asset:
-        print(f"No compatible binary found for {platform.system()} in release.")
+        dialogs.show_warning("Updater Failure", "Sorry, we can't find your OS preferred file extension. Please download the update manually.")
         return
+    
+    download_question = dialogs.show_question("New Update!", f"Version {latest_tag} available! You are currently on {INTERNAL_TAG}.")
 
-    download_and_apply_update(asset["browser_download_url"])
+    if download_question:
+        download_and_apply_update(asset["browser_download_url"])
+    else:
+        return
 
 def find_matching_asset(assets):
     system = platform.system().lower()
@@ -65,7 +69,6 @@ def download_and_apply_update(download_url: str):
     current_os = platform.system().lower()
     current_path = sys.executable
 
-    print("Downloading update...")
     
     unique_id = uuid.uuid4().hex[:8]
     downloaded_file = os.path.join(temp_dir, f"pulsar_update_{unique_id}")
@@ -148,7 +151,6 @@ del "%~f0"
             app_bundle_path = parent
 
         if not app_bundle_path.endswith(".app"):
-            print("Error: Could not locate current .app directory.")
             return
 
         new_app_path = os.path.join(extract_folder, "PulsarLauncher.app")
