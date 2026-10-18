@@ -17,7 +17,7 @@ Pulsar Launcher is a custom Minecraft launcher built with Python, PySide6, and `
 
 * [Python 3](https://www.python.org/) - Core programming language
 * [PySide6](https://wiki.qt.io/Qt_for_Python) - GUI framework (Qt for Python)
-* [minecraft-launcher-lib](https://gitlab.com/JakobDev/minecraft-launcher-lib) - Library handling Minecraft launcher logic and installations
+* [minecraft-launcher-lib](https://codeberg.org/JakobDev/minecraft-launcher-lib/) - Library handling Minecraft launcher logic and installations
 
 
 ## Download & Installation
