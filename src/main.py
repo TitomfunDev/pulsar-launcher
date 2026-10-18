@@ -21,7 +21,7 @@ from core import auth, instances, updater
 from core.instances import DeprecatedFeatureError
 
 try:
-    from version import INTERNAL_TAG
+    from core.version import INTERNAL_TAG
 except ImportError:
     INTERNAL_TAG = "v0.0.0-dev"
 

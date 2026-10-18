@@ -10,7 +10,7 @@ import zipfile
 from packaging.version import parse
 
 try:
-    from version import INTERNAL_TAG
+    from core.version import INTERNAL_TAG
 except ImportError:
     INTERNAL_TAG = "v0.0.0-dev"
 

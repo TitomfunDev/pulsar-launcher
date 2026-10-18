@@ -24,7 +24,7 @@ jobs:
 
     - name: Generate version file
       run: |
-        echo "INTERNAL_TAG = \"${{ github.ref_name }}\"" > src/version.py
+        echo "INTERNAL_TAG = \"${{ github.ref_name }}\"" > src/core/version.py
 
     - name: Build with PyInstaller (Windows/macOS)
       if: matrix.os != 'ubuntu-latest'
@@ -32,7 +32,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
-        pyinstaller --onedir --windowed --paths src --hidden-import version --name PulsarLauncher src/main.py
+        pyinstaller --onedir --windowed --paths src --name PulsarLauncher src/main.py
 
     - name: Build with PyInstaller (Linux - Docker)
       if: matrix.os == 'ubuntu-latest'
@@ -43,7 +43,7 @@ jobs:
           pip install --upgrade pip &&
           pip install -r requirements.txt &&
           pip install pyinstaller &&
-          pyinstaller --onefile --windowed --paths src --hidden-import version --name PulsarLauncher src/main.py &&
+          pyinstaller --onefile --windowed --paths src --name PulsarLauncher src/main.py &&
           mv dist/PulsarLauncher dist/PulsarLauncher-${{ github.ref_name }}-linux
         "
 

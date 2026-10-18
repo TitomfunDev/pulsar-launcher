@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtWidgets import QLabel, QMainWindow, QPushButton, QVBoxLayout, QWidget
 
 try:
-    from version import INTERNAL_TAG
+    from core.version import INTERNAL_TAG
 except ImportError:
     INTERNAL_TAG = "v0.0.0-dev"
 
