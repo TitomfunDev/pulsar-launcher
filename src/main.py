@@ -22,6 +22,8 @@ from core.instances import DeprecatedFeatureError
 
 app = QApplication(sys.argv)
 
+updater.check_and_update()
+
 if auth.get_valid_session() is None :
     auth.login()
 
