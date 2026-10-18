@@ -14,24 +14,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6.QtWidgets import QApplication
 
+from ui import dialogs
 from ui.app import MainLauncherWindow
 from core import auth, instances, updater
 from core.instances import DeprecatedFeatureError
 
-try:
-    from core.version import INTERNAL_TAG
-except ImportError:
-    INTERNAL_TAG = "v0.0.0-dev"
-
 app = QApplication(sys.argv)
-
-QMessageBox.warning(
-        None,
-        "Version",
-        f"{INTERNAL_TAG}"
-    )  
 
 updater.check_and_update()
 
@@ -41,12 +31,7 @@ if auth.get_valid_session() is None :
 try:
     instances.sync_and_get_manifest()
 except DeprecatedFeatureError as e:
-    QMessageBox.warning(
-        None,
-        "Deprecated Feature",
-        f"Warning!\n{e}\nPlease update your launcher as this feature will stop working soon."
-    )  
-
+    dialogs.show_warning("Deprecated Feature", f"Warning!\n{e}\nPlease update your launcher as this feature will stop working soon.")
 
 window = MainLauncherWindow()
 window.show()
