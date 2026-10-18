@@ -1,11 +1,12 @@
 import os
-import sys
-import shutil
-import zipfile
 import platform
-import tempfile
-import subprocess
 import requests
+import shutil
+import subprocess
+import sys
+import tempfile
+import uuid
+import zipfile
 from packaging.version import parse
 
 try:
@@ -50,7 +51,7 @@ def find_matching_asset(assets):
 
     for asset in assets:
         name = asset["name"].lower()
-        if system == "windows" and name.endswith(".exe"):
+        if system == "windows" and name.endswith("-windows.zip"):
             return asset
         elif system == "darwin" and name.endswith(".app.zip"):
             return asset
@@ -65,7 +66,9 @@ def download_and_apply_update(download_url: str):
     current_path = sys.executable
 
     print("Downloading update...")
-    downloaded_file = os.path.join(temp_dir, "pulsar_update_download")
+    
+    unique_id = uuid.uuid4().hex[:8]
+    downloaded_file = os.path.join(temp_dir, f"pulsar_update_{unique_id}")
 
     with requests.get(download_url, stream=True) as r:
         r.raise_for_status()
@@ -74,25 +77,53 @@ def download_and_apply_update(download_url: str):
                 f.write(chunk)
 
     if current_os == "windows":
-        new_exe = downloaded_file + ".exe"
-        if os.path.exists(new_exe):
-            os.remove(new_exe)
-        os.rename(downloaded_file, new_exe)
+        
+        extract_folder = os.path.join(temp_dir, f"pulsar_extracted_{unique_id}")
+        if os.path.exists(extract_folder):
+            shutil.rmtree(extract_folder)
 
-        bat_path = os.path.join(temp_dir, "update_pulsar.bat")
+        with zipfile.ZipFile(downloaded_file, 'r') as zip_ref:
+            zip_ref.extractall(extract_folder)
+
+        current_app_dir = os.path.dirname(current_path)
+
+        bat_path = os.path.join(temp_dir, f"update_pulsar_{unique_id}.bat")
+        
         bat_content = f"""@echo off
-timeout /t 2 /nobreak > nul
-move /y "{new_exe}" "{current_path}"
+echo PulsarLauncher updating... Please wait...
+timeout /t 3 /nobreak >nul
+echo Waiting for PulsarLauncher to close...
+set /a count=0
+
+:loop
+tasklist | find /i "{os.path.basename(current_path)}" >nul
+if errorlevel 1 goto apply_update
+
+set /a count+=1
+if %count% geq 15 (
+    echo Killing PulsarLauncher process...
+    taskkill /f /im "{os.path.basename(current_path)}" >nul 2>&1
+    goto apply_update
+)
+
+timeout /t 1 /nobreak >nul
+goto loop
+
+:apply_update
+echo Updating folder...
+robocopy "{extract_folder}" "{current_app_dir}" /E /MOVE >nul
+
+echo Waiting for file unlock...
+timeout /t 2 /nobreak >nul
+
+echo Launching new version...
 start "" "{current_path}"
 del "%~f0"
 """
         with open(bat_path, "w", encoding="utf-8") as f:
             f.write(bat_content)
 
-        subprocess.Popen(
-            ["cmd.exe", "/c", bat_path],
-            creationflags=subprocess.CREATE_NEW_CONSOLE
-        )
+        os.startfile(bat_path)
         sys.exit(0)
 
     elif current_os == "linux":
@@ -102,7 +133,7 @@ del "%~f0"
         sys.exit(0)
 
     elif current_os == "darwin":
-        extract_folder = os.path.join(temp_dir, "pulsar_mac_extract")
+        extract_folder = os.path.join(temp_dir, f"pulsar_mac_extract_{unique_id}")
         if os.path.exists(extract_folder):
             shutil.rmtree(extract_folder)
 
@@ -122,7 +153,7 @@ del "%~f0"
 
         new_app_path = os.path.join(extract_folder, "PulsarLauncher.app")
 
-        sh_path = os.path.join(temp_dir, "update_pulsar.sh")
+        sh_path = os.path.join(temp_dir, f"update_pulsar_{unique_id}.sh")
         sh_content = f"""#!/bin/bash
 sleep 2
 rm -rf "{app_bundle_path}"
