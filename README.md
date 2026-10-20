@@ -26,7 +26,7 @@ You do not need to compile or run code to use Pulsar Launcher.
 
 1. Go to the [GitHub Releases](https://github.com/TitomfunDev/pulsar-launcher/releases) page.
 2. Download the latest executable for your operating system (Windows / macOS / Linux).
-3. Run the installer or executable and follow the on-screen instructions.
+3. Run executable and follow the on-screen instructions.
 
 
 ## Requirements
