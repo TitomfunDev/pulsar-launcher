@@ -38,18 +38,18 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pyinstaller
-        pyinstaller --onedir --windowed --paths src --name PulsarLauncher src/main.py
+        pyinstaller --clean --onedir --windowed --paths src --name PulsarLauncher src/main.py
 
     - name: Build with PyInstaller (Linux - Docker)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        docker run --rm -v ${{ github.workspace }}:/src python:3.14.8-slim bash -c "
+        docker run --rm --pull always -v ${{ github.workspace }}:/src python:3.14.8-slim bash -c "
           cd /src &&
           apt-get update && apt-get install -y git binutils &&
           pip install --upgrade pip &&
           pip install -r requirements.txt &&
           pip install pyinstaller &&
-          pyinstaller --onefile --windowed --paths src --name PulsarLauncher src/main.py &&
+          pyinstaller --clean --onefile --windowed --paths src --name PulsarLauncher src/main.py &&
           mv dist/PulsarLauncher dist/PulsarLauncher-${{ github.ref_name }}-linux
         "
 
