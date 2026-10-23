@@ -8,6 +8,12 @@ If something is incorrect, please open an issue [here](https://github.com/Titomf
 
 ## [Unreleased] - XXXX-XX-XX
 
+## [0.3.1-alpha] - 2026-10-23
+
+### Security
+-Fixed python vunerability "regarding eMudhra / emSign CA certificate security incident" [Python Forum report](https://discuss.python.org/t/information-for-python-users-regarding-emudhra-emsign-ca-certificate-security-incident/109576) 
+
+
 ## [0.3.0-alpha] - 2026-10-18
 
 ### Added
@@ -29,7 +35,7 @@ If something is incorrect, please open an issue [here](https://github.com/Titomf
 
 ### Added
 - Added Auto-updater for Windows, Linux et MacOS.
-- Added version control on the UI to version correct update.
+- Added version display on the temporary UI to verify update.
 
 
 ## [0.1.0-alpha] - 2026-10-17
