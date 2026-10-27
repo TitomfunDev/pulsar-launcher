@@ -8,7 +8,7 @@ If something is incorrect, please open an issue [here](https://github.com/Titomf
 
 ## [Unreleased] - XXXX-XX-XX
 
-## [0.4.0] - 2026-10-27
+## [0.4.0-alpha] - 2026-10-27
 
 ### Added
 - Added java manager. Will now download Eclipse Termurin java.
