@@ -113,6 +113,10 @@ def install_instance(instance_id: str) -> bool:
     version_file_path = instance_folder / "version.txt"
     version = None
 
+    java_config = instance.get("java") or {}
+    java_version = java_config.get("version", 17)
+    java_exe = java_manager.find_java_executable(java_version)
+
     instance_up_to_date = False
     try:
         with open(version_file_path, "r", encoding="utf-8") as fichier:
@@ -129,34 +133,34 @@ def install_instance(instance_id: str) -> bool:
     loader_config = mc_config.get("loader")
     loader_type = loader_config.get("type") if loader_config else None
     loader_version = loader_config.get("version") if loader_config else None
+    downloads = instance.get("downloads") or {}
 
-    java_config = instance.get("java")
-    java_version = java_config.get("version")
-    java_exe = java_manager.find_java_executable(java_version)
-
-    downloads = instance.get("downloads")
-    max_tasks = 1 + len(downloads)
-
+    max_tasks = 0
+    if not instance_up_to_date:
+        max_tasks += 1 + len(downloads)
     if not java_exe:
         max_tasks += 1
-
+           
     with ThreadPoolExecutor(max_workers=max_tasks) as executor:
         futures = []
 
-        futures.append(
-            executor.submit(
-                download.install_minecraft,mc_config["version"],instance_id,loader_type,loader_version
+        if not instance_up_to_date:
+            futures.append(
+                executor.submit(
+                    download.install_minecraft, mc_config["version"], instance_id, loader_type, loader_version
+                )
             )
-        )
+            for category, data in downloads.items():
+                if isinstance(data, dict) and "url" in data and "sha256" in data:
+                    futures.append(
+                        executor.submit(download.download_ressources, data["url"], data["sha256"], instance_id, category)
+                    )
 
         if not java_exe:
             futures.append(
                 executor.submit(java_manager.install_java, java_version)
             )
 
-        for category, data in downloads.items():
-            if isinstance(data, dict) and "url" in data and "sha256" in data:
-                futures.append(executor.submit(download.download_ressources, data["url"], data["sha256"], instance_id, category))
         for future in futures:
             future.result()
 
