@@ -8,6 +8,14 @@ If something is incorrect, please open an issue [here](https://github.com/Titomf
 
 ## [Unreleased] - XXXX-XX-XX
 
+## [0.4.0] - 2026-10-27
+
+### Added
+- Added java manager. Will now download Eclipse Termurin java.
+
+### Changed
+- Changed updater. Now all updates are forced.
+
 ## [0.3.1-alpha] - 2026-10-23
 
 ### Security
@@ -17,7 +25,7 @@ If something is incorrect, please open an issue [here](https://github.com/Titomf
 ## [0.3.0-alpha] - 2026-10-18
 
 ### Added
-- Added update confirmation prompt for new versions.
+- Added update confirmation prompt for new version. (Deleted in 0.4.0)
 - Integrated PySide6 dialogs for clearer status messages and notifications.
 
 
