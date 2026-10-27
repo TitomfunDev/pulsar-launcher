@@ -113,14 +113,17 @@ def install_instance(instance_id: str) -> bool:
     version_file_path = instance_folder / "version.txt"
     version = None
 
+    instance_up_to_date = False
     try:
         with open(version_file_path, "r", encoding="utf-8") as fichier:
             version = int(fichier.read().strip())
             if version >= instance["instance_version"] :
-                return True
+                instance_up_to_date = True
     except (FileNotFoundError, ValueError):
         pass
 
+    if instance_up_to_date and java_exe:
+        return True
 
     mc_config = instance["minecraft"]
     loader_config = mc_config.get("loader")
