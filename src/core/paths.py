@@ -20,3 +20,7 @@ def get_selected_instance_dir(selected_instance: str) -> str:
 
 def get_cache_dir() -> str:
     return str(DATA_DIR / "cache")
+
+def get_java_path():
+    java_path = Path(get_launcher_dir()) / "java"
+    return java_path

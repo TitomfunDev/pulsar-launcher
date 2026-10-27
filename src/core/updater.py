@@ -1,3 +1,4 @@
+# External dependencies
 import os
 import platform
 import requests
@@ -9,6 +10,7 @@ import uuid
 import zipfile
 from packaging.version import parse
 
+# Pulsar dependencies
 from ui import dialogs
 
 try:
@@ -43,12 +45,7 @@ def check_and_update():
         dialogs.show_warning("Updater Failure", "Sorry, we can't find your OS preferred file extension. Please download the update manually.")
         return
     
-    download_question = dialogs.show_question("New Update!", f"Version {latest_tag} available! You are currently on {INTERNAL_TAG}.")
-
-    if download_question:
-        download_and_apply_update(asset["browser_download_url"])
-    else:
-        return
+    download_and_apply_update(asset["browser_download_url"])
 
 def find_matching_asset(assets):
     system = platform.system().lower()

@@ -1,9 +1,10 @@
-# Dependecies imports
+# External dependencies
 import json
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
-from . import paths
-from . import download
+
+# Pulsar dependencies
+from core import paths, download, java_manager
 
 
 # Variables
@@ -75,13 +76,7 @@ def get_instance_infos(instance_id: str) -> dict:
     return {}
 
 
-def get_installed_instance():
-    
-    return None
-
-
 def get_version(instance_id: str) -> str:
-    """Retourne l'ID exact de la version tel que généré par minecraft_launcher_lib."""
     instance = get_instance_infos(instance_id)
     if not instance:
         raise ValueError(f"Instance '{instance_id}' introuvable.")
@@ -117,6 +112,7 @@ def install_instance(instance_id: str) -> bool:
     instance_folder = Path(paths.get_selected_instance_dir(instance_id))
     version_file_path = instance_folder / "version.txt"
     version = None
+
     try:
         with open(version_file_path, "r", encoding="utf-8") as fichier:
             version = int(fichier.read().strip())
@@ -131,8 +127,15 @@ def install_instance(instance_id: str) -> bool:
     loader_type = loader_config.get("type") if loader_config else None
     loader_version = loader_config.get("version") if loader_config else None
 
+    java_config = instance.get("java")
+    java_version = java_config.get("version")
+    java_exe = java_manager.find_java_executable(java_version)
+
     downloads = instance.get("downloads")
     max_tasks = 1 + len(downloads)
+
+    if not java_exe:
+        max_tasks += 1
 
     with ThreadPoolExecutor(max_workers=max_tasks) as executor:
         futures = []
@@ -142,6 +145,11 @@ def install_instance(instance_id: str) -> bool:
                 download.install_minecraft,mc_config["version"],instance_id,loader_type,loader_version
             )
         )
+
+        if not java_exe:
+            futures.append(
+                executor.submit(java_manager.install_java, java_version)
+            )
 
         for category, data in downloads.items():
             if isinstance(data, dict) and "url" in data and "sha256" in data:
