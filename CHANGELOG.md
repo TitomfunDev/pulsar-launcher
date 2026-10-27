@@ -8,6 +8,11 @@ If something is incorrect, please open an issue [here](https://github.com/Titomf
 
 ## [Unreleased] - XXXX-XX-XX
 
+## [0.4.1-alpha] - 2026-10-27
+
+### Changed
+- Changed java manager and instance gestion to download only what needed (java or instance)
+
 ## [0.4.0-alpha] - 2026-10-27
 
 ### Added
@@ -15,6 +20,7 @@ If something is incorrect, please open an issue [here](https://github.com/Titomf
 
 ### Changed
 - Changed updater. Now all updates are forced.
+
 
 ## [0.3.1-alpha] - 2026-10-23
 
