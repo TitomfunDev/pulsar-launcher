@@ -1,5 +1,6 @@
 # External dependencies
 import json
+import os
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
@@ -117,6 +118,18 @@ def install_instance(instance_id: str) -> bool:
     java_version = java_config.get("version", 17)
     java_exe = java_manager.find_java_executable(java_version)
 
+    if not java_exe:
+        print("Java portable introuvable. Installation de Java requise avant l'instance...")
+        success = java_manager.install_java(java_version)
+        if not success:
+            raise RuntimeError("Échec critique de l'installation de Java.")
+        java_exe = java_manager.find_java_executable(java_version)
+
+    if java_exe:
+        java_bin_dir = str(Path(java_exe).parent)
+        if java_bin_dir not in os.environ["PATH"]:
+            os.environ["PATH"] = java_bin_dir + os.pathsep + os.environ["PATH"]
+
     instance_up_to_date = False
     try:
         with open(version_file_path, "r", encoding="utf-8") as fichier:
@@ -126,7 +139,7 @@ def install_instance(instance_id: str) -> bool:
     except (FileNotFoundError, ValueError):
         pass
 
-    if instance_up_to_date and java_exe:
+    if instance_up_to_date:
         return True
 
     mc_config = instance["minecraft"]
@@ -135,31 +148,21 @@ def install_instance(instance_id: str) -> bool:
     loader_version = loader_config.get("version") if loader_config else None
     downloads = instance.get("downloads") or {}
 
-    max_tasks = 0
-    if not instance_up_to_date:
-        max_tasks += 1 + len(downloads)
-    if not java_exe:
-        max_tasks += 1
+    max_tasks = 1 + len(downloads)
            
     with ThreadPoolExecutor(max_workers=max_tasks) as executor:
         futures = []
 
-        if not instance_up_to_date:
-            futures.append(
-                executor.submit(
-                    download.install_minecraft, mc_config["version"], instance_id, loader_type, loader_version
+        futures.append(
+            executor.submit(
+                download.install_minecraft, mc_config["version"], instance_id, loader_type, loader_version
+            )
+        )
+        for category, data in downloads.items():
+            if isinstance(data, dict) and "url" in data and "sha256" in data:
+                futures.append(
+                    executor.submit(download.download_ressources, data["url"], data["sha256"], instance_id, category)
                 )
-            )
-            for category, data in downloads.items():
-                if isinstance(data, dict) and "url" in data and "sha256" in data:
-                    futures.append(
-                        executor.submit(download.download_ressources, data["url"], data["sha256"], instance_id, category)
-                    )
-
-        if not java_exe:
-            futures.append(
-                executor.submit(java_manager.install_java, java_version)
-            )
 
         for future in futures:
             future.result()
